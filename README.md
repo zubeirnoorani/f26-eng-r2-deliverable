@@ -128,6 +128,8 @@ git clone git@github.com:hcs-t4sg/f25-eng-r2-deliverable.git
 2. In your starter code, there is a `setup.sql` file containing a SQL script that will set up the database for you. Copy the entire contents of the file and paste it into your new query.
 3. Run the query with the button in the bottom right or by pressing `cmd` + `return`. In the results panel, you should see the message `Success. No rows returned`. If you're having issues with this, contact Eli and Itzel (the directors of engineering)!
 
+If you set up your database with an earlier version of these scripts, run `migrations/20260918_mark_starter_species.sql` once in the SQL Editor. It marks the original 16 example species as starter records so only species created in the app can be edited or deleted.
+
 #### Run the webapp and log in
 
 1. The below command will run the webapp locally so that you can view and test your code when developing. Go ahead and run it:

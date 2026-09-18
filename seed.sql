@@ -1,5 +1,5 @@
 -- Run this in the Supabase SQL editor AFTER you have run the webapp and logged in at least once. You need to make sure the `profiles` table has at least one user in it.
--- This will populate the database with some seed data you can use, with the author for each species set to the first user in the `profiles` table.
+-- Starter records stay read-only even though the original seed script assigns their author to the first profile.
 
 do $$
 declare
@@ -8,8 +8,8 @@ begin
   select id from profiles limit 1 into user_id;
 
   insert into
-  species(scientific_name,	common_name,	total_population,	kingdom,	description,	author,	image)
-  values
+  species(scientific_name, common_name, total_population, kingdom, description, author, image, is_seed)
+  select scientific_name, common_name, total_population, kingdom::kingdom, description, author, image, true from (values
     ('Cavia porcellus',	'Guinea Pig',	1000,	'Animalia',	'The guinea pig or domestic guinea pig (Cavia porcellus), also known as the cavy or domestic cavy (/Ààke…™vi/ KAY-vee), is a species of rodent belonging to the genus Cavia in the family Caviidae', user_id,	'https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/George_the_amazing_guinea_pig.jpg/440px-George_the_amazing_guinea_pig.jpg'),
     ('Opuntia ficus-indica',	'Prickly Pear',	null,	'Plantae',	'Opuntia ficus-indica, the Indian fig opuntia, fig opuntia, or prickly pear, is a species of cactus that has long been a domesticated crop plant grown in agricultural economies throughout arid and semiarid parts of the world.',	user_id,	'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/San_Miguel_de_Allende_%28Mexico%2C_November_2018%29_-_106_%2850998375682%29.jpg/440px-San_Miguel_de_Allende_%28Mexico%2C_November_2018%29_-_106_%2850998375682%29.jpg'),
     ('Odontodactylus scyllarus',	'Mantis Shrimp',	5000,	'Animalia',	'Called "sea locusts" by ancient Assyrians, "prawn killers" in Australia, and now sometimes referred to as "thumb splitters" because of the animal''s ability to inflict painful wounds if handled incautiously, mantis shrimp have powerful raptorial appendages that are used to attack and kill prey either by spearing, stunning, or dismembering.',	user_id,	'https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/OdontodactylusScyllarus2.jpg/440px-OdontodactylusScyllarus2.jpg'),
@@ -25,6 +25,7 @@ begin
     ('Panthera ',	'Tiger',	2000,	'Animalia',	'The tiger (Panthera tigris) is the largest living cat species and a member of the genus Panthera.',	user_id,	'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Walking_tiger_female.jpg/440px-Walking_tiger_female.jpg'),
     ('Psychrolutes marcidus',	'Blobfish',	50,	'Animalia',	'The fish family Psychrolutidae (commonly known as blobfishes, toadfishes, flathead sculpins, tadpole sculpins) contains over 35 recognized species in 8 genera. This family consists of bottom-dwelling marine sculpins shaped like tadpoles, with large heads and bodies that taper back into small, flat tails.',	user_id,	'https://th-thumbnailer.cdn-si-edu.com/9UrydtZErwwxVrzQRr4EmWfGAjk=/fit-in/1600x0/https://tf-cmsv2-smithsonianmag-media.s3.amazonaws.com/filer/Blobfish-ugly-470.jpg'),
     ('Giraffa',	'Giraffe',	3000,	'Animalia',	'The giraffe is a large African hoofed mammal belonging to the genus Giraffa. It is the tallest living terrestrial animal and the largest ruminant on Earth. Traditionally, giraffes were thought to be one species, Giraffa camelopardalis, with nine subspecies',	user_id,	'https://images.fineartamerica.com/images-medium-large-5/giraffe-against-landscape-wldavies.jpg'),
-    ('Folivora',	'Sloth',	1500,	'Animalia',	'Sloths are a Neotropical group of xenarthran mammals constituting the suborder Folivora, including the extant arboreal tree sloths and extinct terrestrial ground sloths. Noted for their slowness of movement, tree sloths spend most of their lives hanging upside down in the trees of the tropical rainforests of South America and Central America',	user_id,	'https://i.natgeofe.com/k/df22088f-020a-4fe2-b16c-cda9279dcd05/photoak-threetoedsloth_3x2.png');
+    ('Folivora',	'Sloth',	1500,	'Animalia',	'Sloths are a Neotropical group of xenarthran mammals constituting the suborder Folivora, including the extant arboreal tree sloths and extinct terrestrial ground sloths. Noted for their slowness of movement, tree sloths spend most of their lives hanging upside down in the trees of the tropical rainforests of South America and Central America',	user_id,	'https://i.natgeofe.com/k/df22088f-020a-4fe2-b16c-cda9279dcd05/photoak-threetoedsloth_3x2.png')
+  ) as starter(scientific_name, common_name, total_population, kingdom, description, author, image);
 
 end; $$;

@@ -10,7 +10,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import type { Database } from "@/lib/schema";
-import { cn } from "@/lib/utils";
 import { ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 
@@ -18,7 +17,7 @@ type Species = Database["public"]["Tables"]["species"]["Row"];
 
 const populationFormatter = new Intl.NumberFormat("en-US");
 
-export default function SpeciesDetailsDialog({ species, className }: { species: Species; className?: string }) {
+export default function SpeciesDetailsDialog({ species }: { species: Species }) {
   const commonName = species.common_name?.trim() ?? "";
   const description = species.description?.trim() ?? "";
   const population =
@@ -27,7 +26,7 @@ export default function SpeciesDetailsDialog({ species, className }: { species: 
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className={cn("w-full justify-between", className)}>
+        <Button className="w-full justify-between">
           Learn more
           <ArrowUpRight aria-hidden="true" className="h-4 w-4" />
         </Button>

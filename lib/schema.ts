@@ -38,6 +38,7 @@ export interface Database {
           description: string | null;
           id: number;
           image: string | null;
+          is_seed: boolean;
           kingdom: Database["public"]["Enums"]["kingdom"];
           scientific_name: string;
           total_population: number | null;
@@ -48,6 +49,7 @@ export interface Database {
           description?: string | null;
           id?: number;
           image?: string | null;
+          is_seed?: boolean;
           kingdom: Database["public"]["Enums"]["kingdom"];
           scientific_name: string;
           total_population?: number | null;
@@ -58,6 +60,7 @@ export interface Database {
           description?: string | null;
           id?: number;
           image?: string | null;
+          is_seed?: boolean;
           kingdom?: Database["public"]["Enums"]["kingdom"];
           scientific_name?: string;
           total_population?: number | null;

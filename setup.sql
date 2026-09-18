@@ -48,6 +48,7 @@ create table species (
   kingdom kingdom not null,
   description text,
   image text,
+  is_seed boolean not null default false,
   author uuid not null references profiles
 );
 -- Set up Row Level Security (RLS)
@@ -58,20 +59,24 @@ create policy "Species are viewable by everyone." on species
   for select using (true);
 
 create policy "Users can insert their own species." on species
-  for insert with check (auth.uid() = author);
+  for insert with check (auth.uid() = author and not is_seed);
 
 create policy "Users can update their created species." on species
-  for update using (auth.uid() = author);
+  for update using (auth.uid() = author and not is_seed)
+  with check (auth.uid() = author and not is_seed);
 
 create policy "Users can delete their created species." on species
-  for delete using (auth.uid() = author);
+  for delete using (auth.uid() = author and not is_seed);
 
--- Prevent the author field of a created species from being changed
+-- Prevent a created species from changing ownership or starter status
 create function public.species_columns_updateable()
 returns trigger as $$
 begin
   if new.author <> old.author then
     raise exception 'changing species author is not allowed';
+  end if;
+  if new.is_seed <> old.is_seed then
+    raise exception 'changing species starter status is not allowed';
   end if;
   return new;
 end;

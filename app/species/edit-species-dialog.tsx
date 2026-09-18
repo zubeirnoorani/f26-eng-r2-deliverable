@@ -73,6 +73,7 @@ export default function EditSpeciesDialog({ species, userId }: { species: Specie
       })
       .eq("id", species.id)
       .eq("author", userId)
+      .eq("is_seed", false)
       .select("id")
       .maybeSingle();
 
@@ -96,7 +97,7 @@ export default function EditSpeciesDialog({ species, userId }: { species: Specie
       <DialogTrigger asChild>
         <Button
           variant="outline"
-          className="shrink-0 gap-2 border-[#b7d0be] text-[#225243] hover:bg-[#e8f3ea] hover:text-[#174936]"
+          className="flex-1 gap-2 border-[#b7d0be] text-[#225243] hover:bg-[#e8f3ea] hover:text-[#174936]"
         >
           <Pencil aria-hidden="true" className="h-3.5 w-3.5" />
           Edit
