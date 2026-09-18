@@ -12,12 +12,15 @@ can cause errors with matching props and state in child components if the list o
 */
 import type { Database } from "@/lib/schema";
 import Image from "next/image";
+import EditSpeciesDialog from "./edit-species-dialog";
 import SpeciesDetailsDialog from "./species-details-dialog";
 type Species = Database["public"]["Tables"]["species"]["Row"];
 
-export default function SpeciesCard({ species }: { species: Species }) {
+export default function SpeciesCard({ species, sessionId }: { species: Species; sessionId: string }) {
+  const canEdit = species.author === sessionId;
+
   return (
-    <div className="m-4 w-72 min-w-72 flex-none rounded border-2 p-3 shadow">
+    <div className="m-4 flex w-72 min-w-72 flex-none flex-col rounded border-2 p-3 shadow">
       {species.image && (
         <div className="relative h-40 w-full">
           <Image src={species.image} alt={species.scientific_name} fill style={{ objectFit: "cover" }} />
@@ -25,8 +28,17 @@ export default function SpeciesCard({ species }: { species: Species }) {
       )}
       <h3 className="mt-3 text-2xl font-semibold">{species.scientific_name}</h3>
       <h4 className="text-lg font-light italic">{species.common_name}</h4>
-      <p>{species.description ? species.description.slice(0, 150).trim() + "..." : ""}</p>
-      <SpeciesDetailsDialog species={species} />
+      <p>
+        {species.description
+          ? species.description.length > 150
+            ? `${species.description.slice(0, 150).trimEnd()}…`
+            : species.description
+          : ""}
+      </p>
+      <div className="mt-auto flex items-center gap-2 pt-4">
+        <SpeciesDetailsDialog species={species} className="flex-1" />
+        {canEdit && <EditSpeciesDialog species={species} userId={sessionId} />}
+      </div>
     </div>
   );
 }
