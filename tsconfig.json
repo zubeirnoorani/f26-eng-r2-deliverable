@@ -34,7 +34,8 @@
     "**/*.cjs",
     "**/*.mjs",
     ".eslintrc.cjs",
-    "next.config.js"
+    "next.config.js",
+    ".next-dev/types/**/*.ts"
   ],
   "exclude": ["node_modules"]
 }
