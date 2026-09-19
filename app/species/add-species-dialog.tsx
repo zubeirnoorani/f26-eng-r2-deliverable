@@ -48,13 +48,32 @@ interface WikipediaAutofill {
   articleUrl: string | null;
 }
 
+interface WikipediaLookupError {
+  error: string;
+  matchedTitle: string | null;
+}
+
 function readWikipediaAutofill(value: unknown): WikipediaAutofill | null {
   if (typeof value !== "object" || value === null) return null;
   if (!("title" in value) || !("description" in value) || !("image" in value) || !("articleUrl" in value)) return null;
   if (typeof value.title !== "string" || typeof value.description !== "string") return null;
   if (value.image !== null && typeof value.image !== "string") return null;
   if (value.articleUrl !== null && typeof value.articleUrl !== "string") return null;
-  return { title: value.title, description: value.description, image: value.image, articleUrl: value.articleUrl };
+  return {
+    title: value.title,
+    description: value.description,
+    image: value.image,
+    articleUrl: value.articleUrl,
+  };
+}
+
+function readWikipediaLookupError(value: unknown): WikipediaLookupError | null {
+  if (typeof value !== "object" || value === null || !("error" in value) || typeof value.error !== "string") {
+    return null;
+  }
+
+  const matchedTitle = "matchedTitle" in value && typeof value.matchedTitle === "string" ? value.matchedTitle : null;
+  return { error: value.error, matchedTitle };
 }
 
 export default function AddSpeciesDialog({ userId }: { userId: string }) {
@@ -96,6 +115,17 @@ export default function AddSpeciesDialog({ userId }: { userId: string }) {
         toast({
           title: "No Wikipedia article found",
           description: `Try another common or scientific name for “${speciesName}.”`,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (response.status === 422) {
+        const lookupError = readWikipediaLookupError(body);
+        const matchedArticle = lookupError?.matchedTitle ? `Wikipedia matched “${lookupError.matchedTitle},” but ` : "";
+        toast({
+          title: "That isn’t a species",
+          description: `${matchedArticle}Wikidata does not identify it as a species or biological group. Try a more specific common or scientific name.`,
           variant: "destructive",
         });
         return;
@@ -217,7 +247,7 @@ export default function AddSpeciesDialog({ userId }: { userId: string }) {
                       </span>
                     </div>
                     <p className="mt-1 text-xs leading-5 text-[#60796e]">
-                      Search one name to fill three fields. Review everything before adding the species.
+                      Search one name to fill verified species data. Review everything before adding the species.
                     </p>
                   </div>
                 </div>
