@@ -1,0 +1,15 @@
+# Local dependencies and generated build output
+node_modules
+.next
+.next-dev
+out
+build
+
+# Local deployment metadata and source control internals
+.vercel
+.git
+
+# Local secrets and compiler caches
+.env
+.env.*
+*.tsbuildinfo
