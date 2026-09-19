@@ -20,7 +20,7 @@
     "types": "dotenv -- npm run _types"
   },
   "dependencies": {
-    "@ai-sdk/openai": "^4.0.71",
+    "@ai-sdk/anthropic": "^4.0.58",
     "@hookform/resolvers": "^3.3.2",
     "@radix-ui/react-avatar": "^1.0.4",
     "@radix-ui/react-dialog": "^1.0.5",

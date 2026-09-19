@@ -1,9 +1,9 @@
 import { env } from "@/env.mjs";
-import { createOpenAI } from "@ai-sdk/openai";
+import { createAnthropic } from "@ai-sdk/anthropic";
 import { generateText } from "ai";
 import "server-only";
 
-const openai = createOpenAI({ apiKey: env.OPENAI_API_KEY });
+const anthropic = createAnthropic({ apiKey: env.ANTHROPIC_API_KEY });
 
 const SPECIES_GUIDE_INSTRUCTIONS = `
 You are Field Guide, a concise and welcoming wildlife and species specialist.
@@ -26,21 +26,15 @@ export const SPECIES_CHAT_FALLBACK =
   "I couldn’t reach the field station just now. Please try your species question again in a moment.";
 
 export async function generateResponse(message: string): Promise<string> {
-  if (!env.OPENAI_API_KEY) return SPECIES_CHAT_FALLBACK;
+  if (!env.ANTHROPIC_API_KEY) return SPECIES_CHAT_FALLBACK;
 
   try {
     const { text } = await generateText({
-      model: openai.responses("gpt-5.6-luna"),
+      model: anthropic("claude-sonnet-5"),
       instructions: SPECIES_GUIDE_INSTRUCTIONS,
       prompt: message,
       maxOutputTokens: 500,
       timeout: 20_000,
-      providerOptions: {
-        openai: {
-          store: false,
-          textVerbosity: "low",
-        },
-      },
     });
 
     return text.trim().length > 0 ? text.trim() : SPECIES_CHAT_FALLBACK;
