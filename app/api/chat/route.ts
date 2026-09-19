@@ -1,12 +1,12 @@
 import { generateResponse, SPECIES_CHAT_FALLBACK } from "@/lib/services/species-chat";
-import { defaultSpeciesChatModel } from "@/lib/species-chat-models";
+import { defaultSpeciesChatModel, speciesChatModelIds } from "@/lib/species-chat-models";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
 const chatRequestSchema = z
   .object({
     message: z.string().trim().min(1).max(1_000),
-    model: z.enum(["claude-haiku-4-5-20251001", "claude-sonnet-5"]).default(defaultSpeciesChatModel),
+    model: z.enum(speciesChatModelIds).default(defaultSpeciesChatModel),
   })
   .strict();
 
@@ -32,9 +32,9 @@ export async function POST(request: Request) {
 
   const response = await generateResponse(result.data.message, result.data.model);
 
-  if (response === SPECIES_CHAT_FALLBACK) {
-    return NextResponse.json({ response }, { status: 502 });
+  if (response.text === SPECIES_CHAT_FALLBACK) {
+    return NextResponse.json({ response: response.text, model: response.model }, { status: 502 });
   }
 
-  return NextResponse.json({ response, model: result.data.model });
+  return NextResponse.json({ response: response.text, model: response.model });
 }

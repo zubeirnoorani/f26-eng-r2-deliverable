@@ -26,14 +26,19 @@ Answer quality:
 export const SPECIES_CHAT_FALLBACK =
   "I couldn’t reach the field station just now. Please try your species question again in a moment.";
 
+export interface SpeciesChatResponse {
+  text: string;
+  model: string;
+}
+
 export async function generateResponse(
   message: string,
   model: SpeciesChatModel = defaultSpeciesChatModel,
-): Promise<string> {
-  if (!env.ANTHROPIC_API_KEY) return SPECIES_CHAT_FALLBACK;
+): Promise<SpeciesChatResponse> {
+  if (!env.ANTHROPIC_API_KEY) return { text: SPECIES_CHAT_FALLBACK, model };
 
   try {
-    const { text } = await generateText({
+    const result = await generateText({
       model: anthropic(model),
       instructions: SPECIES_GUIDE_INSTRUCTIONS,
       prompt: message,
@@ -41,8 +46,11 @@ export async function generateResponse(
       timeout: 20_000,
     });
 
-    return text.trim().length > 0 ? text.trim() : SPECIES_CHAT_FALLBACK;
+    return {
+      text: result.text.trim().length > 0 ? result.text.trim() : SPECIES_CHAT_FALLBACK,
+      model: result.response.modelId,
+    };
   } catch {
-    return SPECIES_CHAT_FALLBACK;
+    return { text: SPECIES_CHAT_FALLBACK, model };
   }
 }

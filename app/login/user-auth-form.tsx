@@ -80,13 +80,14 @@ export default function UserAuthForm({ className, ...props }: React.HTMLAttribut
               autoComplete="email"
               autoCorrect="off"
               disabled={isLoading}
+              className="border-[#bcd2c5] bg-white text-[#173d35] focus-visible:ring-[#4e896c]"
               {...register("email")}
             />
             {errors?.email && <p className="px-1 text-xs text-red-600">{errors.email.message}</p>}
           </div>
-          <Button disabled={isLoading}>
+          <Button disabled={isLoading} className="mt-2 bg-[#25684b] text-white hover:bg-[#1b523b]">
             {isLoading && <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />}
-            Sign In with Email
+            Send magic link
           </Button>
         </div>
       </form>

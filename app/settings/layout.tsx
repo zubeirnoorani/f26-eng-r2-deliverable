@@ -1,49 +1,36 @@
+import { FieldPage } from "@/components/global/field-page";
 import { SidebarNav } from "@/components/global/sidebar-nav";
-import { Separator } from "@/components/ui/separator";
-import { PageHeader1, PageSubHeader1 } from "@/components/ui/typography";
 import { createServerSupabaseClient } from "@/lib/server-utils";
 import { redirect } from "next/navigation";
 
 const sidebarNavItems = [
-  {
-    title: "General",
-    href: "/settings/general",
-  },
-  {
-    title: "Profile",
-    href: "/settings/profile",
-  },
+  { title: "General", href: "/settings/general" },
+  { title: "Profile", href: "/settings/profile" },
 ];
 
-interface SettingsLayoutProps {
-  children: React.ReactNode;
-}
-
-export default async function SettingsLayout({ children }: SettingsLayoutProps) {
-  // Create supabase server component client and obtain user session from stored cookie
+export default async function SettingsLayout({ children }: { children: React.ReactNode }) {
   const supabase = createServerSupabaseClient();
   const {
     data: { session },
   } = await supabase.auth.getSession();
 
-  if (!session) {
-    // this is a protected route - only users who are signed in can view this route
-    redirect("/");
-  }
+  if (!session) redirect("/");
 
   return (
-    <>
-      <div className="space-y-0.5">
-        <PageHeader1>Settings</PageHeader1>
-        <PageSubHeader1>Manage your account and profile settings.</PageSubHeader1>
-      </div>
-      <Separator className="my-6" />
-      <div className="flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
-        <aside className="-mx-4 lg:w-1/5">
+    <FieldPage
+      eyebrow="Station controls"
+      title="Your field profile."
+      description="Manage how your name and notes appear throughout the biodiversity archive."
+    >
+      <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[230px_minmax(0,1fr)]">
+        <aside className="border border-[#c8dbd0] bg-[#dfece5] p-3 lg:self-start">
+          <p className="px-3 pb-3 pt-2 font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-[#60796e]">
+            Settings index
+          </p>
           <SidebarNav items={sidebarNavItems} />
         </aside>
-        <div className="flex-1 lg:max-w-2xl">{children}</div>
+        <section className="min-w-0 border border-[#c8dbd0] bg-[#f8fbf9] p-6 sm:p-8 lg:p-10">{children}</section>
       </div>
-    </>
+    </FieldPage>
   );
 }

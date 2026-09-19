@@ -1,37 +1,50 @@
-import { Separator } from "@/components/ui/separator";
-import { TypographyH2 } from "@/components/ui/typography";
+import { FieldPage } from "@/components/global/field-page";
 import { createServerSupabaseClient } from "@/lib/server-utils";
+import { SearchX } from "lucide-react";
 import { redirect } from "next/navigation";
 import AddSpeciesDialog from "./add-species-dialog";
 import SpeciesCard from "./species-card";
 
 export default async function SpeciesList() {
-  // Create supabase server component client and obtain user session from stored cookie
   const supabase = createServerSupabaseClient();
   const {
     data: { session },
   } = await supabase.auth.getSession();
 
-  if (!session) {
-    // this is a protected route - only users who are signed in can view this route
-    redirect("/");
-  }
+  if (!session) redirect("/");
 
-  // Obtain the ID of the currently signed-in user
   const sessionId = session.user.id;
-
   const { data: species } = await supabase.from("species").select("*").order("id", { ascending: false });
 
   return (
-    <>
-      <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
-        <TypographyH2>Species List</TypographyH2>
-        <AddSpeciesDialog userId={sessionId} />
+    <FieldPage
+      eyebrow="Biodiversity archive"
+      title="Species field records."
+      description="Open a record for the complete profile. Add observations of your own, then revise or remove the records you authored."
+      actions={<AddSpeciesDialog userId={sessionId} />}
+    >
+      <div className="mx-auto max-w-7xl">
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-[#c8dbd0] pb-4">
+          <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[#517765]">
+            Collection index
+          </p>
+          <p className="text-xs text-[#60796e]">{species?.length ?? 0} records catalogued</p>
+        </div>
+
+        {species && species.length > 0 ? (
+          <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+            {species.map((record) => (
+              <SpeciesCard key={record.id} species={record} sessionId={sessionId} />
+            ))}
+          </div>
+        ) : (
+          <div className="flex min-h-72 flex-col items-center justify-center border border-dashed border-[#aac4b5] bg-[#f8fbf9] px-6 text-center">
+            <SearchX aria-hidden="true" className="h-7 w-7 text-[#5f806f]" />
+            <h2 className="mt-4 font-serif text-2xl text-[#204b3d]">No field records yet</h2>
+            <p className="mt-2 text-sm text-[#60796e]">Add the first species to begin this collection.</p>
+          </div>
+        )}
       </div>
-      <Separator className="my-4" />
-      <div className="flex flex-wrap justify-center">
-        {species?.map((species) => <SpeciesCard key={species.id} species={species} sessionId={sessionId} />)}
-      </div>
-    </>
+    </FieldPage>
   );
 }

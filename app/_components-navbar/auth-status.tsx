@@ -12,7 +12,7 @@ export default async function AuthStatus() {
 
   if (!user) {
     return (
-      <Button asChild>
+      <Button asChild size="sm" className="bg-[#bf7138] text-white hover:bg-[#a95e2a]">
         <Link href="/login">Log in</Link>
       </Button>
     );

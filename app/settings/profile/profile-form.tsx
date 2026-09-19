@@ -107,7 +107,7 @@ export default function ProfileForm({ profile }: { profile: Profile }) {
 
   return (
     <Form {...form}>
-      <form onSubmit={(e: BaseSyntheticEvent) => void form.handleSubmit(onSubmit)(e)} className="space-y-8">
+      <form onSubmit={(e: BaseSyntheticEvent) => void form.handleSubmit(onSubmit)(e)} className="space-y-7">
         <FormField
           control={form.control}
           name="username"
@@ -116,7 +116,12 @@ export default function ProfileForm({ profile }: { profile: Profile }) {
               <FormLabel>Username</FormLabel>
               <FormControl>
                 {/* Set inputs to readOnly (boolean prop) depending on toggleable value of isEditing */}
-                <Input readOnly={!isEditing} placeholder="Username" {...field} />
+                <Input
+                  readOnly={!isEditing}
+                  placeholder="Username"
+                  className="border-[#bcd2c5] bg-white read-only:bg-[#eef5f1] focus-visible:ring-[#4e896c]"
+                  {...field}
+                />
               </FormControl>
               <FormDescription>
                 This is your public display name. It can be your real name or a pseudonym.
@@ -128,7 +133,7 @@ export default function ProfileForm({ profile }: { profile: Profile }) {
         <FormItem>
           <FormLabel>Email</FormLabel>
           <FormControl>
-            <Input readOnly placeholder={profile.email} />
+            <Input readOnly placeholder={profile.email} className="border-[#bcd2c5] bg-[#eef5f1]" />
           </FormControl>
           <FormDescription>This is your verified email address.</FormDescription>
           <FormMessage />
@@ -147,7 +152,7 @@ export default function ProfileForm({ profile }: { profile: Profile }) {
                     readOnly={!isEditing}
                     value={value ?? ""}
                     placeholder="Tell us a little bit about yourself"
-                    className="resize-none"
+                    className="resize-none border-[#bcd2c5] bg-white read-only:bg-[#eef5f1] focus-visible:ring-[#4e896c]"
                     {...rest}
                   />
                 </FormControl>
@@ -160,7 +165,7 @@ export default function ProfileForm({ profile }: { profile: Profile }) {
         {/* Conditionally render action buttons depending on if the form is in viewing/editing mode */}
         {isEditing ? (
           <>
-            <Button type="submit" className="mr-2">
+            <Button type="submit" className="mr-2 bg-[#25684b] text-white hover:bg-[#1b523b]">
               Update profile
             </Button>
             <Button variant="secondary" onClick={handleCancel}>
@@ -169,7 +174,9 @@ export default function ProfileForm({ profile }: { profile: Profile }) {
           </>
         ) : (
           // Toggle editing mode
-          <Button onClick={startEditing}>Edit Profile</Button>
+          <Button onClick={startEditing} className="bg-[#25684b] text-white hover:bg-[#1b523b]">
+            Edit profile
+          </Button>
         )}
       </form>
     </Form>

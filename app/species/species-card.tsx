@@ -1,54 +1,63 @@
 "use client";
-/*
-Note: "use client" is a Next.js App Router directive that tells React to render the component as
-a client component rather than a server component. This establishes the server-client boundary,
-providing access to client-side functionality such as hooks and event handlers to this component and
-any of its imported children. Although the SpeciesCard component itself does not use any client-side
-functionality, it is beneficial to move it to the client because it is rendered in a list with a unique
-key prop in species/page.tsx. When multiple component instances are rendered from a list, React uses the unique key prop
-on the client-side to correctly match component state and props should the order of the list ever change.
-React server components don't track state between rerenders, so leaving the uniquely identified components (e.g. SpeciesCard)
-can cause errors with matching props and state in child components if the list order changes.
-*/
+
 import type { Database } from "@/lib/schema";
 import Image from "next/image";
 import DeleteSpeciesDialog from "./delete-species-dialog";
 import EditSpeciesDialog from "./edit-species-dialog";
 import SpeciesDetailsDialog from "./species-details-dialog";
+
 type Species = Database["public"]["Tables"]["species"]["Row"];
 
 export default function SpeciesCard({ species, sessionId }: { species: Species; sessionId: string }) {
   const canManage = !species.is_seed && species.author === sessionId;
   const sourceLabel = species.is_seed ? "Starter collection" : canManage ? "Your species" : "Community species";
+  const recordedCommonName = species.common_name?.trim() ?? "";
+  const recordedDescription = species.description?.trim() ?? "";
+  const commonName = recordedCommonName.length > 0 ? recordedCommonName : "Common name not recorded";
+  const description =
+    recordedDescription.length > 0 ? recordedDescription : "No field description has been recorded yet.";
 
   return (
-    <div className="m-4 flex w-72 min-w-72 flex-none flex-col rounded border-2 p-3 shadow">
-      {species.image && (
-        <div className="relative h-40 w-full">
-          <Image src={species.image} alt={species.scientific_name} fill style={{ objectFit: "cover" }} />
-        </div>
-      )}
-      <span className="mt-3 font-mono text-[10px] font-semibold uppercase tracking-[0.15em] text-[#4b7b62]">
-        {sourceLabel}
-      </span>
-      <h3 className="mt-2 text-2xl font-semibold">{species.scientific_name}</h3>
-      <h4 className="text-lg font-light italic">{species.common_name}</h4>
-      <p>
-        {species.description
-          ? species.description.length > 150
-            ? `${species.description.slice(0, 150).trimEnd()}…`
-            : species.description
-          : ""}
-      </p>
-      <div className="mt-auto space-y-2 pt-4">
-        <SpeciesDetailsDialog species={species} />
-        {canManage && (
-          <div className="flex gap-2">
-            <EditSpeciesDialog species={species} userId={sessionId} />
-            <DeleteSpeciesDialog species={species} userId={sessionId} />
+    <article className="group flex min-w-0 flex-col overflow-hidden border border-[#c8dbd0] bg-[#f8fbf9] shadow-[0_16px_35px_-32px_rgba(14,60,50,0.75)] transition hover:-translate-y-0.5 hover:border-[#9dbbab] hover:bg-white hover:shadow-[0_22px_40px_-30px_rgba(14,60,50,0.65)]">
+      <div className="relative h-52 overflow-hidden bg-[#1b4a40]">
+        {species.image ? (
+          <Image
+            src={species.image}
+            alt={commonName}
+            fill
+            sizes="(max-width: 639px) 100vw, (max-width: 1279px) 50vw, 33vw"
+            className="object-cover transition duration-500 group-hover:scale-[1.025]"
+          />
+        ) : (
+          <div className="flex h-full items-center justify-center">
+            <span className="font-serif text-7xl italic text-[#a9cbbb]">{species.scientific_name.charAt(0)}</span>
           </div>
         )}
+        <span className="absolute left-4 top-4 bg-[#f8fbf9]/95 px-2.5 py-1 font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-[#34664f] shadow-sm backdrop-blur">
+          {sourceLabel}
+        </span>
       </div>
-    </div>
+
+      <div className="flex flex-1 flex-col p-5">
+        <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-[#5f806f]">
+          {species.kingdom} · Record {String(species.id).padStart(3, "0")}
+        </p>
+        <h2 className="mt-3 break-words font-serif text-2xl font-normal italic leading-tight text-[#173d35]">
+          {species.scientific_name}
+        </h2>
+        <p className="mt-1 text-sm font-medium text-[#547466]">{commonName}</p>
+        <p className="mt-4 line-clamp-3 text-sm leading-6 text-[#60796e]">{description}</p>
+
+        <div className="mt-auto space-y-2 pt-6">
+          <SpeciesDetailsDialog species={species} />
+          {canManage && (
+            <div className="flex gap-2">
+              <EditSpeciesDialog species={species} userId={sessionId} />
+              <DeleteSpeciesDialog species={species} userId={sessionId} />
+            </div>
+          )}
+        </div>
+      </div>
+    </article>
   );
 }

@@ -1,7 +1,12 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { defaultSpeciesChatModel, speciesChatModels, type SpeciesChatModel } from "@/lib/species-chat-models";
+import {
+  defaultSpeciesChatModel,
+  getSpeciesChatModelLabel,
+  speciesChatModels,
+  type SpeciesChatModel,
+} from "@/lib/species-chat-models";
 import { ArrowUp, Leaf, MapPin, PawPrint, RotateCcw, ShieldCheck, Utensils } from "lucide-react";
 import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 import ReactMarkdown from "react-markdown";
@@ -9,6 +14,7 @@ import ReactMarkdown from "react-markdown";
 interface ChatMessage {
   role: "user" | "bot";
   content: string;
+  model?: string;
 }
 
 const fieldPrompts = [
@@ -57,9 +63,10 @@ function createResearchSteps(prompt: string): string[] {
   ].slice(0, 5);
 }
 
-function readResponse(value: unknown): string | null {
-  if (typeof value !== "object" || value === null || !("response" in value)) return null;
-  return typeof value.response === "string" ? value.response : null;
+function readResponse(value: unknown): { response: string; model: string } | null {
+  if (typeof value !== "object" || value === null || !("response" in value) || !("model" in value)) return null;
+  if (typeof value.response !== "string" || typeof value.model !== "string") return null;
+  return { response: value.response, model: value.model };
 }
 
 export default function SpeciesChatbot() {
@@ -121,7 +128,7 @@ export default function SpeciesChatbot() {
 
       if (response === null) throw new Error("Invalid chat response");
 
-      setChatLog((current) => [...current, { role: "bot", content: response }]);
+      setChatLog((current) => [...current, { role: "bot", content: response.response, model: response.model }]);
     } catch {
       setError("The field guide could not answer. Check your connection and try again.");
     } finally {
@@ -143,8 +150,8 @@ export default function SpeciesChatbot() {
   };
 
   return (
-    <div className="mx-auto max-w-6xl text-[#173d35]">
-      <header className="relative overflow-hidden rounded-t-2xl bg-[#123d36] px-6 py-8 text-[#ecf6ee] sm:px-9 sm:py-10">
+    <div className="flex min-h-[calc(100dvh-4rem)] w-full flex-col bg-[#eef5f1] text-[#173d35]">
+      <header className="relative overflow-hidden bg-[#123d36] px-6 py-8 text-[#ecf6ee] sm:px-9 sm:py-10 lg:px-12">
         <div
           aria-hidden="true"
           className="absolute -right-16 -top-20 h-64 w-64 rounded-full border border-[#78a994]/30"
@@ -167,7 +174,7 @@ export default function SpeciesChatbot() {
         </div>
       </header>
 
-      <div className="grid overflow-hidden rounded-b-2xl border border-t-0 border-[#c8dbd0] bg-[#eef5f1] shadow-[0_20px_55px_-35px_rgba(14,60,50,0.55)] lg:grid-cols-[240px_minmax(0,1fr)]">
+      <div className="grid flex-1 border-t border-[#315c51] bg-[#eef5f1] lg:grid-cols-[260px_minmax(0,1fr)]">
         <aside className="border-b border-[#c8dbd0] bg-[#dfece5] p-5 lg:border-b-0 lg:border-r lg:p-6">
           <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[#517765]">Answer model</p>
           <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
@@ -213,7 +220,7 @@ export default function SpeciesChatbot() {
           </div>
         </aside>
 
-        <section className="flex min-h-[560px] min-w-0 flex-col bg-[#f8fbf9]" aria-label="Species chat">
+        <section className="flex min-h-[620px] min-w-0 flex-col bg-[#f8fbf9]" aria-label="Species chat">
           <div className="flex min-h-14 items-center justify-between border-b border-[#d5e3da] px-5 py-3 sm:px-7">
             <div className="flex items-center gap-2">
               <span className={`h-2 w-2 rounded-full ${isWaiting ? "animate-pulse bg-[#d69b43]" : "bg-[#4d9a6e]"}`} />
@@ -290,7 +297,9 @@ export default function SpeciesChatbot() {
                   )}
                   <div className={`max-w-[88%] sm:max-w-[76%] ${entry.role === "user" ? "text-right" : "text-left"}`}>
                     <p className="mb-1.5 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-[#6c8379]">
-                      {entry.role === "user" ? "You" : "Field guide"}
+                      {entry.role === "user"
+                        ? "You"
+                        : `Field guide · ${getSpeciesChatModelLabel(entry.model ?? defaultSpeciesChatModel)}`}
                     </p>
                     <div
                       className={`rounded-xl px-4 py-3 text-left text-sm leading-6 shadow-sm ${
@@ -313,7 +322,7 @@ export default function SpeciesChatbot() {
                 </div>
                 <div className="max-w-[88%] sm:max-w-[76%]">
                   <p className="mb-1.5 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-[#6c8379]">
-                    Field guide · working
+                    {getSpeciesChatModelLabel(selectedModel)} · working
                   </p>
                   <div className="min-w-[230px] rounded-xl rounded-tl-sm border border-[#d3e2d8] bg-white px-4 py-3 shadow-sm">
                     <p className="text-sm font-medium text-[#365d4d]">{researchSteps[researchStepIndex]}</p>

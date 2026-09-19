@@ -33,10 +33,12 @@ export default function UserNav({ profile }: { profile: Profile }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-          <Avatar className="h-8 w-8">
+        <Button variant="ghost" className="relative h-9 w-9 rounded-full hover:bg-[#21483f]">
+          <Avatar className="h-8 w-8 border border-[#709186]">
             {/* <AvatarImage src="/avatars/01.png" alt="@shadcn" /> */}
-            <AvatarFallback>{profile.display_name.slice(0, 2).toUpperCase()}</AvatarFallback>
+            <AvatarFallback className="bg-[#dfece5] text-xs font-semibold text-[#17483b]">
+              {profile.display_name.slice(0, 2).toUpperCase()}
+            </AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>

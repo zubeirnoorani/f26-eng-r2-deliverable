@@ -14,22 +14,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       {/* Hydration warning suppressed because of next-themes https://github.com/pacocoursey/next-themes */}
-      <body>
+      <body className="min-h-dvh bg-[#eef5f1] text-[#173d35]">
         <Providers>
-          <div className="flex-col md:flex">
-            <div className="border-b">
-              <div className="flex h-16 items-center px-4">
-                <Navbar className="mx-6" />
-                <div className="ml-auto flex items-center space-x-4">
+          <div className="min-h-dvh">
+            <header className="sticky top-0 z-40 border-b border-[#315c51] bg-[#0d302b] text-[#ecf6ee] shadow-sm">
+              <div className="flex h-16 items-center gap-3 px-4 sm:px-6 lg:px-8">
+                <Navbar className="min-w-0 flex-1" />
+                <div className="ml-auto flex shrink-0 items-center gap-2">
                   <ModeToggle />
                   <AuthStatus />
                 </div>
               </div>
-            </div>
-            {/* Conditionally display website if logged in, else display login page */}
-            <div className="space-y-6 p-10 pb-16 md:block">
-              <main>{children}</main>
-            </div>
+            </header>
+            <div>{children}</div>
           </div>
         </Providers>
         <Toaster />

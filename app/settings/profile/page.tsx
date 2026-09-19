@@ -5,10 +5,10 @@ import ProfileForm from "./profile-form";
 
 function SettingsError({ message }: { message: string }) {
   return (
-    <>
-      <h3 className="text-lg font-medium">Error</h3>
-      <p>{message}</p>
-    </>
+    <div className="border-l-2 border-[#b55343] bg-[#fff0ec] p-5">
+      <h3 className="font-serif text-2xl font-normal text-[#7d3028]">Profile unavailable</h3>
+      <p className="mt-2 text-sm text-[#815d56]">{message}</p>
+    </div>
   );
 }
 
@@ -44,15 +44,12 @@ export default async function Settings() {
   }
 
   return (
-    <>
-      <div className="space-y-6">
-        <div>
-          <h3 className="text-lg font-medium">Profile</h3>
-          <p className="text-sm text-muted-foreground">This is how others will see you on the site.</p>
-        </div>
-        <Separator />
-        <ProfileForm profile={profileData} />
-      </div>
-    </>
+    <div>
+      <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[#517765]">Profile</p>
+      <h2 className="mt-2 font-serif text-3xl font-normal text-[#204b3d]">Your public field card</h2>
+      <p className="mt-2 text-sm leading-6 text-[#60796e]">This is how other contributors see you in the archive.</p>
+      <Separator className="my-7 bg-[#d5e3da]" />
+      <ProfileForm profile={profileData} />
+    </div>
   );
 }

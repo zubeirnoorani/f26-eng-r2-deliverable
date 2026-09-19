@@ -97,20 +97,23 @@ export default function AddSpeciesDialog({ userId }: { userId: string }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="secondary">
+        <Button className="bg-[#bf7138] text-white hover:bg-[#a95e2a]">
           <Icons.add className="mr-3 h-5 w-5" />
           Add Species
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-h-screen overflow-y-auto sm:max-w-[600px]">
-        <DialogHeader>
-          <DialogTitle>Add Species</DialogTitle>
-          <DialogDescription>
+      <DialogContent className="max-h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] max-w-lg overflow-y-auto border-0 bg-[#f7faf6] p-0 text-[#183e34] shadow-2xl sm:max-w-[680px]">
+        <DialogHeader className="border-b border-[#d7e6d9] px-6 py-5 pr-14 text-left sm:px-8 sm:pr-16">
+          <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[#537d67]">
+            New field record
+          </p>
+          <DialogTitle className="font-serif text-3xl font-normal text-[#183e34]">Add a species</DialogTitle>
+          <DialogDescription className="text-sm text-[#5e7769]">
             Add a new species here. Click &quot;Add Species&quot; below when you&apos;re done.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={(e: BaseSyntheticEvent) => void form.handleSubmit(onSubmit)(e)}>
+          <form className="p-6 sm:p-8" onSubmit={(e: BaseSyntheticEvent) => void form.handleSubmit(onSubmit)(e)}>
             <div className="grid w-full items-center gap-4">
               <FormField
                 control={form.control}
@@ -236,12 +239,12 @@ export default function AddSpeciesDialog({ userId }: { userId: string }) {
                   );
                 }}
               />
-              <div className="flex">
-                <Button type="submit" className="ml-1 mr-1 flex-auto">
+              <div className="mt-2 flex gap-2 border-t border-[#d7e6d9] pt-5">
+                <Button type="submit" className="flex-auto bg-[#25684b] text-white hover:bg-[#1b523b]">
                   Add Species
                 </Button>
                 <DialogClose asChild>
-                  <Button type="button" className="ml-1 mr-1 flex-auto" variant="secondary">
+                  <Button type="button" className="flex-auto" variant="secondary">
                     Cancel
                   </Button>
                 </DialogClose>
