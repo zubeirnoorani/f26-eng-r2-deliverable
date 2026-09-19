@@ -1,6 +1,6 @@
 import { FieldPage } from "@/components/global/field-page";
 import { createServerSupabaseClient } from "@/lib/server-utils";
-import { ArrowUpRight, Bot, Gauge, LibraryBig } from "lucide-react";
+import { ArrowUpRight, Bot, LibraryBig } from "lucide-react";
 import Link from "next/link";
 
 const stations = [
@@ -17,13 +17,6 @@ const stations = [
     label: "Ask the guide",
     description: "Explore habitats, diets, behavior, adaptations, and conservation with a focused AI guide.",
     requiresAccount: false,
-  },
-  {
-    href: "/species-speed",
-    icon: Gauge,
-    label: "Speed lab",
-    description: "Study how movement and survival strategies vary across the animal kingdom.",
-    requiresAccount: true,
   },
 ] as const;
 
@@ -49,7 +42,7 @@ export default async function Home() {
         </Link>
       }
     >
-      <section className="mx-auto grid max-w-7xl gap-px overflow-hidden border border-[#c8dbd0] bg-[#c8dbd0] lg:grid-cols-3">
+      <section className="mx-auto grid max-w-7xl gap-px overflow-hidden border border-[#c8dbd0] bg-[#c8dbd0] md:grid-cols-2">
         {stations.map(({ href, icon: Icon, label, description, requiresAccount }, index) => (
           <Link
             key={href}

@@ -27,12 +27,6 @@ export default async function Navbar({ className, ...props }: React.HTMLAttribut
             Species
           </Link>
           <Link
-            href="/species-speed"
-            className="whitespace-nowrap font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-[#c5dbcf] transition hover:text-white"
-          >
-            Speed lab
-          </Link>
-          <Link
             href="/species-chatbot"
             className="whitespace-nowrap font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-[#c5dbcf] transition hover:text-white"
           >
