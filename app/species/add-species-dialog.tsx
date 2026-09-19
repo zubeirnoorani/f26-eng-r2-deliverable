@@ -11,7 +11,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
@@ -19,6 +19,7 @@ import { toast } from "@/components/ui/use-toast";
 import { createBrowserSupabaseClient } from "@/lib/client-utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ExternalLink, Search } from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState, type BaseSyntheticEvent, type KeyboardEvent } from "react";
 import { useForm } from "react-hook-form";
@@ -105,6 +106,7 @@ export default function AddSpeciesDialog({ userId }: { userId: string }) {
 
       form.setValue("description", autofill.description, { shouldDirty: true, shouldValidate: true });
       form.setValue("image", autofill.image, { shouldDirty: true, shouldValidate: true });
+      form.setValue("common_name", autofill.title, { shouldDirty: true, shouldValidate: true });
       if (autofill.articleUrl !== null) {
         setWikipediaMatch({ title: autofill.title, url: autofill.articleUrl });
       }
@@ -113,8 +115,8 @@ export default function AddSpeciesDialog({ userId }: { userId: string }) {
         title: `Found ${autofill.title}`,
         description:
           autofill.image === null
-            ? "The description was filled in, but this article has no lead image."
-            : "The description and image are ready for you to review.",
+            ? "Common name and description were filled in. This article has no lead image."
+            : "Common name, description, and image are ready for you to review.",
       });
     } catch {
       toast({
@@ -198,64 +200,89 @@ export default function AddSpeciesDialog({ userId }: { userId: string }) {
           <form className="p-6 sm:p-8" onSubmit={(e: BaseSyntheticEvent) => void form.handleSubmit(onSubmit)(e)}>
             <div className="grid w-full items-center gap-4">
               <section
-                className="mb-2 border border-[#bfd4c7] bg-[#eaf3ed] p-4"
+                className="mb-2 overflow-hidden border border-[#b9cfc2] bg-[#eaf3ed]"
                 aria-labelledby="wikipedia-search-label"
               >
-                <div className="flex items-center justify-between gap-3">
-                  <div>
-                    <p
-                      id="wikipedia-search-label"
-                      className="font-mono text-[10px] font-semibold uppercase tracking-[0.17em] text-[#46705d]"
-                    >
-                      Wikipedia autofill
-                    </p>
+                <div className="flex items-start gap-4 border-b border-[#c8dbd0] bg-[#f8fbf9] p-4">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[#d5ddd8] bg-white p-1.5 shadow-sm">
+                    <Image src="/wikipedia-logo-v2.png" width={40} height={37} alt="" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-3">
+                      <p id="wikipedia-search-label" className="font-serif text-lg font-semibold text-[#254d40]">
+                        Import from Wikipedia
+                      </p>
+                      <span className="hidden rounded-full border border-[#c5d8cd] bg-[#eef5f1] px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.12em] text-[#557467] sm:block">
+                        Optional
+                      </span>
+                    </div>
                     <p className="mt-1 text-xs leading-5 text-[#60796e]">
-                      Fill the description and image from an article.
+                      Search one name to fill three fields. Review everything before adding the species.
                     </p>
                   </div>
-                  <span className="hidden rounded-full border border-[#b3ccbd] bg-[#f8fbf9] px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.12em] text-[#557467] sm:block">
-                    Optional
-                  </span>
                 </div>
-                <div className="mt-3 flex flex-col gap-2 sm:flex-row">
-                  <Input
-                    value={wikipediaSearch}
-                    onChange={(event) => {
-                      setWikipediaSearch(event.target.value);
-                      setWikipediaMatch(null);
-                    }}
-                    onKeyDown={handleWikipediaSearchKeyDown}
-                    disabled={isSearchingWikipedia}
-                    maxLength={100}
-                    placeholder="e.g. snow leopard or Panthera uncia"
-                    aria-label="Common or scientific species name"
-                    className="border-[#a9c5b5] bg-white focus-visible:ring-[#4e896c]"
-                  />
-                  <Button
-                    type="button"
-                    disabled={isSearchingWikipedia || wikipediaSearch.trim().length === 0}
-                    onClick={() => void searchWikipedia()}
-                    className="shrink-0 gap-2 bg-[#25684b] text-white hover:bg-[#1b523b]"
-                  >
-                    {isSearchingWikipedia ? (
-                      <Icons.spinner aria-hidden="true" className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <Search aria-hidden="true" className="h-4 w-4" />
-                    )}
-                    {isSearchingWikipedia ? "Searching…" : "Search"}
-                  </Button>
+                <div className="p-4">
+                  <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.15em] text-[#5f806f]">
+                    Fills automatically
+                  </p>
+                  <div className="mt-2 flex flex-wrap gap-1.5" aria-label="Fields filled by Wikipedia search">
+                    {["Common name", "Description", "Image URL"].map((fieldName) => (
+                      <span
+                        key={fieldName}
+                        className="rounded-full border border-[#bed2c6] bg-white px-2.5 py-1 text-[11px] font-medium text-[#3d6955]"
+                      >
+                        {fieldName}
+                      </span>
+                    ))}
+                  </div>
+                  <p className="mt-2 text-[11px] leading-5 text-[#6a8277]">
+                    Scientific name, kingdom, and total population stay manual.
+                  </p>
+                  <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+                    <Input
+                      value={wikipediaSearch}
+                      onChange={(event) => {
+                        setWikipediaSearch(event.target.value);
+                        setWikipediaMatch(null);
+                      }}
+                      onKeyDown={handleWikipediaSearchKeyDown}
+                      disabled={isSearchingWikipedia}
+                      maxLength={100}
+                      placeholder="Common or scientific name"
+                      aria-label="Common or scientific species name"
+                      className="border-[#a9c5b5] bg-white focus-visible:ring-[#4e896c]"
+                    />
+                    <Button
+                      type="button"
+                      disabled={isSearchingWikipedia || wikipediaSearch.trim().length === 0}
+                      onClick={() => void searchWikipedia()}
+                      className="shrink-0 gap-2 bg-[#25684b] text-white hover:bg-[#1b523b]"
+                    >
+                      {isSearchingWikipedia ? (
+                        <Icons.spinner aria-hidden="true" className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Search aria-hidden="true" className="h-4 w-4" />
+                      )}
+                      {isSearchingWikipedia ? "Searching…" : "Search Wikipedia"}
+                    </Button>
+                  </div>
+                  {wikipediaMatch && (
+                    <div className="mt-3 flex items-center justify-between gap-3 border-l-2 border-[#bf7138] bg-white px-3 py-2">
+                      <p className="text-xs text-[#4f6f61]">
+                        Imported from <span className="font-semibold text-[#254d40]">{wikipediaMatch.title}</span>
+                      </p>
+                      <a
+                        href={wikipediaMatch.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        aria-label={`Open ${wikipediaMatch.title} on Wikipedia`}
+                        className="shrink-0 text-[#39715a] hover:text-[#254d40]"
+                      >
+                        <ExternalLink aria-hidden="true" className="h-3.5 w-3.5" />
+                      </a>
+                    </div>
+                  )}
                 </div>
-                {wikipediaMatch && (
-                  <a
-                    href={wikipediaMatch.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-[#39715a] underline-offset-4 hover:underline"
-                  >
-                    Matched: {wikipediaMatch.title}
-                    <ExternalLink aria-hidden="true" className="h-3 w-3" />
-                  </a>
-                )}
               </section>
 
               <FormField
@@ -334,6 +361,9 @@ export default function AddSpeciesDialog({ userId }: { userId: string }) {
                           }
                         />
                       </FormControl>
+                      <FormDescription>
+                        Wikipedia has no consistent exact population field, so enter the best current estimate manually.
+                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   );
