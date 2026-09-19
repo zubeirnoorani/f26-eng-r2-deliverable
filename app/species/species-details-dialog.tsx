@@ -10,18 +10,22 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import type { Database } from "@/lib/schema";
+import { getSpeciesImageUrl } from "@/lib/species-images";
 import { ArrowUpRight } from "lucide-react";
 import Image from "next/image";
+import { useState } from "react";
 
 type Species = Database["public"]["Tables"]["species"]["Row"];
 
 const populationFormatter = new Intl.NumberFormat("en-US");
 
 export default function SpeciesDetailsDialog({ species }: { species: Species }) {
+  const [failedImageUrl, setFailedImageUrl] = useState<string | null>(null);
   const commonName = species.common_name?.trim() ?? "";
   const description = species.description?.trim() ?? "";
   const population =
     species.total_population === null ? "Not recorded" : populationFormatter.format(species.total_population);
+  const imageUrl = species.image === null ? null : getSpeciesImageUrl(species.image);
 
   return (
     <Dialog>
@@ -48,13 +52,14 @@ export default function SpeciesDetailsDialog({ species }: { species: Species }) 
 
         <div className="grid md:grid-cols-2">
           <div className="relative isolate min-h-[220px] overflow-hidden bg-[#1b4a40] md:min-h-[510px]">
-            {species.image ? (
+            {imageUrl !== null && failedImageUrl !== imageUrl ? (
               <Image
-                src={species.image}
+                src={imageUrl}
                 alt={commonName.length > 0 ? commonName : species.scientific_name}
                 fill
                 sizes="(max-width: 767px) 100vw, 430px"
                 className="object-cover"
+                onError={() => setFailedImageUrl(imageUrl)}
               />
             ) : (
               <div className="flex h-full min-h-[220px] items-center justify-center px-8 text-center md:min-h-[510px]">
@@ -63,7 +68,7 @@ export default function SpeciesDetailsDialog({ species }: { species: Species }) 
                 </span>
               </div>
             )}
-            {!species.image && (
+            {(imageUrl === null || failedImageUrl === imageUrl) && (
               <p className="absolute bottom-5 left-6 right-6 font-mono text-[10px] uppercase tracking-[0.2em] text-white">
                 Image not recorded
               </p>
