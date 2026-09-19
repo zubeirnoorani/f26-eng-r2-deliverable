@@ -2,6 +2,7 @@
 
 import type { Database } from "@/lib/schema";
 import { getSpeciesImageUrl } from "@/lib/species-images";
+import { Search } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import DeleteSpeciesDialog from "./delete-species-dialog";
@@ -10,7 +11,15 @@ import SpeciesDetailsDialog from "./species-details-dialog";
 
 type Species = Database["public"]["Tables"]["species"]["Row"];
 
-export default function SpeciesCard({ species, sessionId }: { species: Species; sessionId: string }) {
+export default function SpeciesCard({
+  species,
+  sessionId,
+  matchedFields = [],
+}: {
+  species: Species;
+  sessionId: string;
+  matchedFields?: string[];
+}) {
   const [failedImageUrl, setFailedImageUrl] = useState<string | null>(null);
   const canManage = !species.is_seed && species.author === sessionId;
   const sourceLabel = species.is_seed ? "Starter collection" : canManage ? "Your species" : "Community species";
@@ -51,6 +60,12 @@ export default function SpeciesCard({ species, sessionId }: { species: Species; 
           {species.scientific_name}
         </h2>
         <p className="mt-1 text-sm font-medium text-[#547466]">{commonName}</p>
+        {matchedFields.length > 0 && (
+          <p className="mt-3 flex items-center gap-2 border-l-2 border-[#bf7138] bg-[#eef5f1] px-3 py-2 font-mono text-[9px] font-semibold uppercase tracking-[0.1em] text-[#4f7462]">
+            <Search aria-hidden="true" className="h-3 w-3 shrink-0" />
+            Matched in {matchedFields.join(" + ")}
+          </p>
+        )}
         <p className="mt-4 line-clamp-3 text-sm leading-6 text-[#60796e]">{description}</p>
 
         <div className="mt-auto space-y-2 pt-6">
