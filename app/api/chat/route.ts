@@ -1,10 +1,12 @@
 import { generateResponse, SPECIES_CHAT_FALLBACK } from "@/lib/services/species-chat";
+import { defaultSpeciesChatModel } from "@/lib/species-chat-models";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
 const chatRequestSchema = z
   .object({
     message: z.string().trim().min(1).max(1_000),
+    model: z.enum(["claude-haiku-4-5-20251001", "claude-sonnet-5"]).default(defaultSpeciesChatModel),
   })
   .strict();
 
@@ -20,14 +22,19 @@ export async function POST(request: Request) {
   const result = chatRequestSchema.safeParse(body);
 
   if (!result.success) {
-    return NextResponse.json({ error: "Message must be between 1 and 1,000 characters." }, { status: 400 });
+    const invalidModel = result.error.issues.some((issue) => issue.path[0] === "model");
+    const error = invalidModel
+      ? "Choose one of the supported chatbot models."
+      : "Message must be between 1 and 1,000 characters.";
+
+    return NextResponse.json({ error }, { status: 400 });
   }
 
-  const response = await generateResponse(result.data.message);
+  const response = await generateResponse(result.data.message, result.data.model);
 
   if (response === SPECIES_CHAT_FALLBACK) {
     return NextResponse.json({ response }, { status: 502 });
   }
 
-  return NextResponse.json({ response });
+  return NextResponse.json({ response, model: result.data.model });
 }

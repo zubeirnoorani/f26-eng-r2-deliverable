@@ -1,4 +1,5 @@
 import { env } from "@/env.mjs";
+import { defaultSpeciesChatModel, type SpeciesChatModel } from "@/lib/species-chat-models";
 import { createAnthropic } from "@ai-sdk/anthropic";
 import { generateText } from "ai";
 import "server-only";
@@ -25,12 +26,15 @@ Answer quality:
 export const SPECIES_CHAT_FALLBACK =
   "I couldn’t reach the field station just now. Please try your species question again in a moment.";
 
-export async function generateResponse(message: string): Promise<string> {
+export async function generateResponse(
+  message: string,
+  model: SpeciesChatModel = defaultSpeciesChatModel,
+): Promise<string> {
   if (!env.ANTHROPIC_API_KEY) return SPECIES_CHAT_FALLBACK;
 
   try {
     const { text } = await generateText({
-      model: anthropic("claude-sonnet-5"),
+      model: anthropic(model),
       instructions: SPECIES_GUIDE_INSTRUCTIONS,
       prompt: message,
       maxOutputTokens: 500,
